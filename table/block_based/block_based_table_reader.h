@@ -538,6 +538,7 @@ class BlockBasedTable::PartitionedIndexIteratorState
 
 // Stores all the properties associated with a BlockBasedTable.
 // These are immutable.
+// BlockBasedTable核心数据域
 struct BlockBasedTable::Rep {
   Rep(const ImmutableOptions& _ioptions, const EnvOptions& _env_options,
       const BlockBasedTableOptions& _table_opt,
@@ -563,6 +564,7 @@ struct BlockBasedTable::Rep {
   const FilterPolicy* const filter_policy;
   const InternalKeyComparator& internal_comparator;
   Status status;
+  // 对磁盘上文件的封装，用于读取文件的内容
   std::unique_ptr<RandomAccessFileReader> file;
   OffsetableCacheKey base_cache_key;
   PersistentCacheOptions persistent_cache_options;
@@ -570,6 +572,14 @@ struct BlockBasedTable::Rep {
   // Footer contains the fixed table information
   Footer footer;
 
+  /*
+   * index_reader和filter分别用于读取一个Table的index信息和filter信息。
+   * 当blockcache未开启,或者禁止了cache_index_and_filter_blocks时，
+   * filter block和index block的内存
+   * 由BlockBasedTable通过index_reader和filter持有。
+   * 如果blockcache开启，此时filter block和index block
+   * 通过blockcache管理，index_reader和filter不再有用。
+   */
   std::unique_ptr<IndexReader> index_reader;
   std::unique_ptr<FilterBlockReader> filter;
   std::unique_ptr<UncompressionDictReader> uncompression_dict_reader;
