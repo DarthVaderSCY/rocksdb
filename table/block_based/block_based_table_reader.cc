@@ -12,6 +12,7 @@
 #include <array>
 #include <atomic>
 #include <cstdint>
+#include <iostream>
 #include <limits>
 #include <memory>
 #include <string>
@@ -555,6 +556,8 @@ CacheKey BlockBasedTable::GetCacheKey(const OffsetableCacheKey& base_cache_key,
   return base_cache_key.WithOffset(handle.offset() >> 2);
 }
 
+// 初始化rep, 并预取table的index block和filter block
+// 成功Open则赋值传出参数table_reader
 Status BlockBasedTable::Open(
     const ReadOptions& read_options, const ImmutableOptions& ioptions,
     const EnvOptions& env_options, const BlockBasedTableOptions& table_options,
@@ -2045,6 +2048,7 @@ Status BlockBasedTable::Get(const ReadOptions& read_options, const Slice& key,
                             GetContext* get_context,
                             const SliceTransform* prefix_extractor,
                             bool skip_filters) {
+  std::cout << "call BlockBasedTable::Get" << std::endl;
   // Similar to Bloom filter !may_match
   // If timestamp is beyond the range of the table, skip
   if (!TimestampMayMatch(read_options)) {

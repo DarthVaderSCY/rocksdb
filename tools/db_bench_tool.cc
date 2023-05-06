@@ -241,9 +241,11 @@ DEFINE_string(
     "operation includes a rare but possible retry in case it got "
     "`Status::Incomplete()`. This happens upon encountering more keys than "
     "have ever been seen by the thread (or eight initially)\n"
-    "\tbackup --  Create a backup of the current DB and verify that a new backup is corrected. "
+    "\tbackup --  Create a backup of the current DB and verify that a new "
+    "backup is corrected. "
     "Rate limit can be specified through --backup_rate_limit\n"
-    "\trestore -- Restore the DB from the latest backup available, rate limit can be specified through --restore_rate_limit\n");
+    "\trestore -- Restore the DB from the latest backup available, rate limit "
+    "can be specified through --restore_rate_limit\n");
 
 DEFINE_int64(num, 1000000, "Number of key/values to place in database");
 
@@ -1034,7 +1036,6 @@ DEFINE_string(
 static enum ROCKSDB_NAMESPACE::CompressionType
     FLAGS_blob_db_compression_type_e = ROCKSDB_NAMESPACE::kSnappyCompression;
 
-
 // Integrated BlobDB options
 DEFINE_bool(
     enable_blob_files,
@@ -1105,7 +1106,6 @@ DEFINE_int32(prepopulate_blob_cache, 0,
              "[Integrated BlobDB] Pre-populate hot/warm blobs in blob cache. 0 "
              "to disable and 1 to insert during flush.");
 
-
 // Secondary DB instance Options
 DEFINE_bool(use_secondary_db, false,
             "Open a RocksDB secondary instance. A primary instance can be "
@@ -1119,13 +1119,11 @@ DEFINE_int32(secondary_update_interval, 5,
              "Secondary instance attempts to catch up with the primary every "
              "secondary_update_interval seconds.");
 
-
 DEFINE_bool(report_bg_io_stats, false,
             "Measure times spents on I/Os while in compactions. ");
 
 DEFINE_bool(use_stderr_info_logger, false,
             "Write info logs to stderr instead of to LOG file. ");
-
 
 DEFINE_string(trace_file, "", "Trace workload to a file. ");
 
@@ -1918,11 +1916,7 @@ struct DBWithColumnFamilies {
   std::vector<int> cfh_idx_to_prob;  // ith index holds probability of operating
                                      // on cfh[i].
 
-  DBWithColumnFamilies()
-      : db(nullptr)
-        ,
-        opt_txn_db(nullptr)
-  {
+  DBWithColumnFamilies() : db(nullptr), opt_txn_db(nullptr) {
     cfh.clear();
     num_created = 0;
     num_hot = 0;
@@ -1934,8 +1928,7 @@ struct DBWithColumnFamilies {
         opt_txn_db(other.opt_txn_db),
         num_created(other.num_created.load()),
         num_hot(other.num_hot),
-        cfh_idx_to_prob(other.cfh_idx_to_prob) {
-  }
+        cfh_idx_to_prob(other.cfh_idx_to_prob) {}
 
   void DeleteDBs() {
     std::for_each(cfh.begin(), cfh.end(),
@@ -3724,6 +3717,7 @@ class Benchmark {
           combined_stats.ReportFinal(name);
         }
       }
+
       if (post_process_method != nullptr) {
         (this->*post_process_method)();
       }
@@ -5337,7 +5331,7 @@ class Benchmark {
         }
 
         if (usecs_since_last >
-            (FLAGS_sine_write_rate_interval_milliseconds * uint64_t{1000})) {
+            (FLAGS_sine_write_rate_interval_milliseconds* uint64_t{1000})) {
           double usecs_since_start =
               static_cast<double>(now - thread->stats.GetStart());
           thread->stats.ResetSineInterval();
@@ -5689,7 +5683,9 @@ class Benchmark {
     }
   }
 
+  // 首先在顺序读中加入预取逻辑
   void ReadSequential(ThreadState* thread, DB* db) {
+    std::cout << "call Benchmark::ReadSequential" << std::endl;
     ReadOptions options = read_options_;
     std::unique_ptr<char[]> ts_guard;
     Slice ts;
@@ -6452,7 +6448,7 @@ class Benchmark {
 
       if (FLAGS_sine_mix_rate &&
           usecs_since_last >
-              (FLAGS_sine_mix_rate_interval_milliseconds * uint64_t{1000})) {
+              (FLAGS_sine_mix_rate_interval_milliseconds* uint64_t{1000})) {
         double usecs_since_start =
             static_cast<double>(now - thread->stats.GetStart());
         thread->stats.ResetSineInterval();
@@ -8317,7 +8313,6 @@ class Benchmark {
     }
   }
 
-
   void Replay(ThreadState* thread) {
     if (db_.db != nullptr) {
       Replay(thread, &db_);
@@ -8405,7 +8400,6 @@ class Benchmark {
     assert(s.ok());
     delete backup_engine;
   }
-
 };
 
 int db_bench_tool(int argc, char** argv) {
