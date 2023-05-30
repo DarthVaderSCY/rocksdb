@@ -11,6 +11,7 @@
 
 #include <cassert>
 #include <cinttypes>
+#include <iostream>
 #include <string>
 
 #include "logging/logging.h"
@@ -78,6 +79,7 @@ inline bool BlockFetcher::TryGetFromPrefetchBuffer() {
             opts, file_, handle_.offset(), block_size_with_trailer_, &slice_,
             &io_s, read_options_.rate_limiter_priority);
       } else {
+        // std::cout << "call TryReadFromCache()" << std::endl;
         read_from_prefetch_buffer = prefetch_buffer_->TryReadFromCache(
             opts, file_, handle_.offset(), block_size_with_trailer_, &slice_,
             &io_s, read_options_.rate_limiter_priority, for_compaction_);
@@ -243,7 +245,9 @@ IOStatus BlockFetcher::ReadBlockContents() {
 #endif  // NDEBUG
     return IOStatus::OK();
   }
+  // 尝试从预取buffer读取
   if (TryGetFromPrefetchBuffer()) {
+    // std::cout << "call TryGetFromPrefetchBuffer()" << std::endl;
     if (!io_status_.ok()) {
       return io_status_;
     }

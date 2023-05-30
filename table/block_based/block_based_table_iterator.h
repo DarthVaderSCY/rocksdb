@@ -7,6 +7,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file. See the AUTHORS file for names of contributors.
 #pragma once
+#include "table/block_based/adaptive_prefetcher.h"
 #include "table/block_based/block_based_table_reader.h"
 #include "table/block_based/block_based_table_reader_impl.h"
 #include "table/block_based/block_prefetcher.h"
@@ -34,6 +35,7 @@ class BlockBasedTableIterator : public InternalIteratorBase<Slice> {
         pinned_iters_mgr_(nullptr),
         prefix_extractor_(prefix_extractor),
         lookup_context_(caller),
+        adaptive_prefetcher_(512),
         block_prefetcher_(
             compaction_readahead_size,
             table_->get_rep()->table_options.initial_auto_readahead_size),
@@ -220,6 +222,7 @@ class BlockBasedTableIterator : public InternalIteratorBase<Slice> {
   uint64_t prev_block_offset_ = std::numeric_limits<uint64_t>::max();
   BlockCacheLookupContext lookup_context_;
 
+  AdaptivePrefetcher adaptive_prefetcher_;
   BlockPrefetcher block_prefetcher_;
 
   const bool allow_unprepared_value_;

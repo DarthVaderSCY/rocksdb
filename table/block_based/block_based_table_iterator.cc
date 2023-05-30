@@ -255,14 +255,18 @@ void BlockBasedTableIterator::InitDataBlock() {
     //   Enabled after 2 sequential IOs when ReadOptions.readahead_size == 0.
     // Explicit user requested readahead:
     //   Enabled from the very first IO when ReadOptions.readahead_size is set.
-    block_prefetcher_.PrefetchIfNeeded(
-        rep, data_block_handle, read_options_.readahead_size, is_for_compaction,
-        /*no_sequential_checking=*/false, read_options_.rate_limiter_priority);
+    // block_prefetcher_.PrefetchIfNeeded(
+    //     rep, data_block_handle, read_options_.readahead_size,
+    //     is_for_compaction,
+    //     /*no_sequential_checking=*/false,
+    //     read_options_.rate_limiter_priority);
+    adaptive_prefetcher_.PrefetchIfNeeded(rep, data_block_handle,
+                                          read_options_.readahead_size);
     Status s;
     table_->NewDataBlockIterator<DataBlockIter>(
         read_options_, data_block_handle, &block_iter_, BlockType::kData,
         /*get_context=*/nullptr, &lookup_context_,
-        block_prefetcher_.prefetch_buffer(),
+        adaptive_prefetcher_.prefetch_buffer(),
         /*for_compaction=*/is_for_compaction, /*async_read=*/false, s);
     block_iter_points_to_real_block_ = true;
     CheckDataBlockWithinUpperBound();

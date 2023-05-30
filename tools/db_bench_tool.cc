@@ -3381,7 +3381,7 @@ class Benchmark {
         entries_per_batch_ = 1000;
         method = &Benchmark::WriteSeq;
       } else if (name == "fillrandom") {
-        fresh_db = true;
+        fresh_db = false;
         method = &Benchmark::WriteRandom;
       } else if (name == "filluniquerandom" ||
                  name == "fillanddeleteuniquerandom") {
@@ -5685,7 +5685,9 @@ class Benchmark {
 
   // 首先在顺序读中加入预取逻辑
   void ReadSequential(ThreadState* thread, DB* db) {
-    std::cout << "call Benchmark::ReadSequential" << std::endl;
+    std::cout << "call Benchmark::ReadSequential(ThreadState* thread, DB* db)"
+              << std::endl;
+    std::cout << "reads_=" << reads_ << std::endl;
     ReadOptions options = read_options_;
     std::unique_ptr<char[]> ts_guard;
     Slice ts;

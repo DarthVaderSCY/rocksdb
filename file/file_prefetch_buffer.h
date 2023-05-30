@@ -70,7 +70,7 @@ class FilePrefetchBuffer {
   //   If max_readahead_size > readahead_size, the readahead size will be
   //   doubled on every IO until max_readahead_size is hit.
   //   Typically this is set as a multiple of readahead_size.
-  //   max_readahead_size should be greater than equal to readahead_size.
+  //   max_readahead_size should be greater than or equal to readahead_size.
   // enable : controls whether reading from the buffer is enabled.
   //   If false, TryReadFromCache() always return false, and we only take stats
   //   for the minimum offset if track_min_offset = true.
