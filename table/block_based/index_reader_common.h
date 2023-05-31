@@ -26,7 +26,7 @@ class BlockBasedTable::IndexReaderCommon : public BlockBasedTable::IndexReader {
 
  protected:
   static Status ReadIndexBlock(const BlockBasedTable* table,
-                               FilePrefetchBuffer* prefetch_buffer,
+                               SmartPrefetchBuffer* prefetch_buffer,
                                const ReadOptions& read_options, bool use_cache,
                                GetContext* get_context,
                                BlockCacheLookupContext* lookup_context,

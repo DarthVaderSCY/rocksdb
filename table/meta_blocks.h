@@ -107,7 +107,7 @@ bool NotifyCollectTableCollectorsOnFinish(
 //          object, otherwise value of `table_properties` will not be modified.
 Status ReadTablePropertiesHelper(
     const ReadOptions& ro, const BlockHandle& handle,
-    RandomAccessFileReader* file, FilePrefetchBuffer* prefetch_buffer,
+    RandomAccessFileReader* file, SmartPrefetchBuffer* prefetch_buffer,
     const Footer& footer, const ImmutableOptions& ioptions,
     std::unique_ptr<TableProperties>* table_properties,
     MemoryAllocator* memory_allocator = nullptr);
@@ -122,7 +122,7 @@ Status ReadTableProperties(RandomAccessFileReader* file, uint64_t file_size,
                            const ReadOptions& read_options,
                            std::unique_ptr<TableProperties>* properties,
                            MemoryAllocator* memory_allocator = nullptr,
-                           FilePrefetchBuffer* prefetch_buffer = nullptr);
+                           SmartPrefetchBuffer* prefetch_buffer = nullptr);
 
 // Find the meta block from the meta index block. Returns OK and
 // block_handle->IsNull() if not found.
@@ -144,7 +144,7 @@ Status FindMetaBlockInFile(RandomAccessFileReader* file, uint64_t file_size,
                            const std::string& meta_block_name,
                            BlockHandle* block_handle,
                            MemoryAllocator* memory_allocator = nullptr,
-                           FilePrefetchBuffer* prefetch_buffer = nullptr,
+                           SmartPrefetchBuffer* prefetch_buffer = nullptr,
                            Footer* footer_out = nullptr);
 
 // Read meta block contents
@@ -154,14 +154,14 @@ Status ReadMetaIndexBlockInFile(RandomAccessFileReader* file,
                                 const ReadOptions& read_options,
                                 BlockContents* block_contents,
                                 MemoryAllocator* memory_allocator = nullptr,
-                                FilePrefetchBuffer* prefetch_buffer = nullptr,
+                                SmartPrefetchBuffer* prefetch_buffer = nullptr,
                                 Footer* footer_out = nullptr);
 
 // Read the specified meta block with name meta_block_name
 // from `file` and initialize `contents` with contents of this block.
 // Return Status::OK in case of success.
 Status ReadMetaBlock(RandomAccessFileReader* file,
-                     FilePrefetchBuffer* prefetch_buffer, uint64_t file_size,
+                     SmartPrefetchBuffer* prefetch_buffer, uint64_t file_size,
                      uint64_t table_magic_number,
                      const ImmutableOptions& ioptions,
                      const ReadOptions& read_options,

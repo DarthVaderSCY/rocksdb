@@ -326,7 +326,7 @@ Status MergeHelper::MergeUntil(InternalIterator* iter,
           return s;
         }
 
-        FilePrefetchBuffer* prefetch_buffer =
+        SmartPrefetchBuffer* prefetch_buffer =
             prefetch_buffers ? prefetch_buffers->GetOrCreatePrefetchBuffer(
                                    blob_index.file_number())
                              : nullptr;

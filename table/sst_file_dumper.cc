@@ -98,7 +98,7 @@ Status SstFileDumper::GetTableReader(const std::string& file_path) {
 
   file_.reset(new RandomAccessFileReader(std::move(file), file_path));
 
-  FilePrefetchBuffer prefetch_buffer(
+  SmartPrefetchBuffer prefetch_buffer(
       0 /* readahead_size */, 0 /* max_readahead_size */, true /* enable */,
       false /* track_min_offset */);
   if (s.ok()) {
@@ -352,10 +352,9 @@ Status SstFileDumper::ShowCompressionSize(
 
 // Reads TableProperties prior to opening table reader in order to set up
 // options.
-Status SstFileDumper::ReadTableProperties(uint64_t table_magic_number,
-                                          RandomAccessFileReader* file,
-                                          uint64_t file_size,
-                                          FilePrefetchBuffer* prefetch_buffer) {
+Status SstFileDumper::ReadTableProperties(
+    uint64_t table_magic_number, RandomAccessFileReader* file,
+    uint64_t file_size, SmartPrefetchBuffer* prefetch_buffer) {
   // TODO: plumb Env::IOActivity
   const ReadOptions read_options;
   Status s = ROCKSDB_NAMESPACE::ReadTableProperties(

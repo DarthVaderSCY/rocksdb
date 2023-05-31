@@ -7,12 +7,12 @@
 
 namespace ROCKSDB_NAMESPACE {
 
-FilePrefetchBuffer* PrefetchBufferCollection::GetOrCreatePrefetchBuffer(
+SmartPrefetchBuffer* PrefetchBufferCollection::GetOrCreatePrefetchBuffer(
     uint64_t file_number) {
   auto& prefetch_buffer = prefetch_buffers_[file_number];
   if (!prefetch_buffer) {
     prefetch_buffer.reset(
-        new FilePrefetchBuffer(readahead_size_, readahead_size_));
+        new SmartPrefetchBuffer(readahead_size_, readahead_size_));
   }
 
   return prefetch_buffer.get();

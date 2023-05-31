@@ -15,7 +15,7 @@ namespace ROCKSDB_NAMESPACE {
 
 Status UncompressionDictReader::Create(
     const BlockBasedTable* table, const ReadOptions& ro,
-    FilePrefetchBuffer* prefetch_buffer, bool use_cache, bool prefetch,
+    SmartPrefetchBuffer* prefetch_buffer, bool use_cache, bool prefetch,
     bool pin, BlockCacheLookupContext* lookup_context,
     std::unique_ptr<UncompressionDictReader>* uncompression_dict_reader) {
   assert(table);
@@ -44,7 +44,7 @@ Status UncompressionDictReader::Create(
 }
 
 Status UncompressionDictReader::ReadUncompressionDictionary(
-    const BlockBasedTable* table, FilePrefetchBuffer* prefetch_buffer,
+    const BlockBasedTable* table, SmartPrefetchBuffer* prefetch_buffer,
     const ReadOptions& read_options, bool use_cache, GetContext* get_context,
     BlockCacheLookupContext* lookup_context,
     CachableEntry<UncompressionDict>* uncompression_dict) {
@@ -77,7 +77,7 @@ Status UncompressionDictReader::ReadUncompressionDictionary(
 }
 
 Status UncompressionDictReader::GetOrReadUncompressionDictionary(
-    FilePrefetchBuffer* prefetch_buffer, const ReadOptions& ro, bool no_io,
+    SmartPrefetchBuffer* prefetch_buffer, const ReadOptions& ro, bool no_io,
     bool verify_checksums, GetContext* get_context,
     BlockCacheLookupContext* lookup_context,
     CachableEntry<UncompressionDict>* uncompression_dict) const {

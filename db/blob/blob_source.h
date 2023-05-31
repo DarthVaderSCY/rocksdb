@@ -22,7 +22,7 @@ namespace ROCKSDB_NAMESPACE {
 
 struct ImmutableOptions;
 class Status;
-class FilePrefetchBuffer;
+class SmartPrefetchBuffer;
 class Slice;
 
 // BlobSource is a class that provides universal access to blobs, regardless of
@@ -52,7 +52,7 @@ class BlobSource {
   Status GetBlob(const ReadOptions& read_options, const Slice& user_key,
                  uint64_t file_number, uint64_t offset, uint64_t file_size,
                  uint64_t value_size, CompressionType compression_type,
-                 FilePrefetchBuffer* prefetch_buffer, PinnableSlice* value,
+                 SmartPrefetchBuffer* prefetch_buffer, PinnableSlice* value,
                  uint64_t* bytes_read);
 
   // Read multiple blobs from the underlying cache or blob file(s).

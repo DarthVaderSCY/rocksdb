@@ -760,6 +760,7 @@ set(SOURCES
         env/mock_env.cc
         env/unique_id_gen.cc
         file/delete_scheduler.cc
+        file/smart_prefetch_buffer.cc
         file/file_prefetch_buffer.cc
         file/file_util.cc
         file/filename.cc

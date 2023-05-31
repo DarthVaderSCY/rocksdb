@@ -53,7 +53,7 @@ class SstFileDumper {
   Status GetTableReader(const std::string& file_path);
   Status ReadTableProperties(uint64_t table_magic_number,
                              RandomAccessFileReader* file, uint64_t file_size,
-                             FilePrefetchBuffer* prefetch_buffer);
+                             SmartPrefetchBuffer* prefetch_buffer);
 
   Status CalculateCompressedTableSize(const TableBuilderOptions& tb_options,
                                       size_t block_size,
@@ -96,4 +96,3 @@ class SstFileDumper {
 };
 
 }  // namespace ROCKSDB_NAMESPACE
-

@@ -346,7 +346,7 @@ std::string Footer::ToString() const {
 }
 
 Status ReadFooterFromFile(const IOOptions& opts, RandomAccessFileReader* file,
-                          FileSystem& fs, FilePrefetchBuffer* prefetch_buffer,
+                          FileSystem& fs, SmartPrefetchBuffer* prefetch_buffer,
                           uint64_t file_size, Footer* footer,
                           uint64_t enforce_table_magic_number) {
   if (file_size < Footer::kMinEncodedLength) {

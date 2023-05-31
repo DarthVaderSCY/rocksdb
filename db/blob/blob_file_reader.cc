@@ -12,6 +12,7 @@
 #include "db/blob/blob_log_format.h"
 #include "file/file_prefetch_buffer.h"
 #include "file/filename.h"
+#include "file/smart_prefetch_buffer.h"
 #include "monitoring/statistics.h"
 #include "options/cf_options.h"
 #include "rocksdb/file_system.h"
@@ -301,7 +302,7 @@ BlobFileReader::~BlobFileReader() = default;
 Status BlobFileReader::GetBlob(
     const ReadOptions& read_options, const Slice& user_key, uint64_t offset,
     uint64_t value_size, CompressionType compression_type,
-    FilePrefetchBuffer* prefetch_buffer, MemoryAllocator* allocator,
+    SmartPrefetchBuffer* prefetch_buffer, MemoryAllocator* allocator,
     std::unique_ptr<BlobContents>* result, uint64_t* bytes_read) const {
   assert(result);
 

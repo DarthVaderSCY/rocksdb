@@ -12,7 +12,7 @@
 
 namespace ROCKSDB_NAMESPACE {
 Status BlockBasedTable::IndexReaderCommon::ReadIndexBlock(
-    const BlockBasedTable* table, FilePrefetchBuffer* prefetch_buffer,
+    const BlockBasedTable* table, SmartPrefetchBuffer* prefetch_buffer,
     const ReadOptions& read_options, bool use_cache, GetContext* get_context,
     BlockCacheLookupContext* lookup_context,
     CachableEntry<Block>* index_block) {

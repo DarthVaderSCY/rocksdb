@@ -38,7 +38,7 @@ namespace ROCKSDB_NAMESPACE {
 class BlockFetcher {
  public:
   BlockFetcher(RandomAccessFileReader* file,
-               FilePrefetchBuffer* prefetch_buffer,
+               SmartPrefetchBuffer* prefetch_buffer,
                const Footer& footer /* ref retained */,
                const ReadOptions& read_options,
                const BlockHandle& handle /* ref retained */,
@@ -98,7 +98,7 @@ class BlockFetcher {
   static const uint32_t kDefaultStackBufferSize = 5000;
 
   RandomAccessFileReader* file_;
-  FilePrefetchBuffer* prefetch_buffer_;
+  SmartPrefetchBuffer* prefetch_buffer_;
   const Footer& footer_;
   const ReadOptions read_options_;
   const BlockHandle& handle_;

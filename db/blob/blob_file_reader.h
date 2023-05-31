@@ -22,7 +22,7 @@ struct FileOptions;
 class HistogramImpl;
 struct ReadOptions;
 class Slice;
-class FilePrefetchBuffer;
+class SmartPrefetchBuffer;
 class BlobContents;
 class Statistics;
 
@@ -45,7 +45,7 @@ class BlobFileReader {
   Status GetBlob(const ReadOptions& read_options, const Slice& user_key,
                  uint64_t offset, uint64_t value_size,
                  CompressionType compression_type,
-                 FilePrefetchBuffer* prefetch_buffer,
+                 SmartPrefetchBuffer* prefetch_buffer,
                  MemoryAllocator* allocator,
                  std::unique_ptr<BlobContents>* result,
                  uint64_t* bytes_read) const;

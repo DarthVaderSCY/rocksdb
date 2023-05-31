@@ -15,7 +15,7 @@ namespace ROCKSDB_NAMESPACE {
 
 template <typename TBlocklike>
 Status FilterBlockReaderCommon<TBlocklike>::ReadFilterBlock(
-    const BlockBasedTable* table, FilePrefetchBuffer* prefetch_buffer,
+    const BlockBasedTable* table, SmartPrefetchBuffer* prefetch_buffer,
     const ReadOptions& read_options, bool use_cache, GetContext* get_context,
     BlockCacheLookupContext* lookup_context,
     CachableEntry<TBlocklike>* filter_block) {

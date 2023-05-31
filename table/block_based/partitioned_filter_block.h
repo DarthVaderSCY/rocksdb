@@ -109,7 +109,7 @@ class PartitionedFilterBlockReader
 
   static std::unique_ptr<FilterBlockReader> Create(
       const BlockBasedTable* table, const ReadOptions& ro,
-      FilePrefetchBuffer* prefetch_buffer, bool use_cache, bool prefetch,
+      SmartPrefetchBuffer* prefetch_buffer, bool use_cache, bool prefetch,
       bool pin, BlockCacheLookupContext* lookup_context);
 
   bool KeyMayMatch(const Slice& key, const bool no_io,
@@ -138,7 +138,7 @@ class PartitionedFilterBlockReader
       const CachableEntry<Block_kFilterPartitionIndex>& filter_block,
       const Slice& entry) const;
   Status GetFilterPartitionBlock(
-      FilePrefetchBuffer* prefetch_buffer, const BlockHandle& handle,
+      SmartPrefetchBuffer* prefetch_buffer, const BlockHandle& handle,
       bool no_io, GetContext* get_context,
       BlockCacheLookupContext* lookup_context, const ReadOptions& read_options,
       CachableEntry<ParsedFullFilterBlock>* filter_block) const;

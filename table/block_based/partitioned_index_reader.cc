@@ -16,7 +16,7 @@
 namespace ROCKSDB_NAMESPACE {
 Status PartitionIndexReader::Create(
     const BlockBasedTable* table, const ReadOptions& ro,
-    FilePrefetchBuffer* prefetch_buffer, bool use_cache, bool prefetch,
+    SmartPrefetchBuffer* prefetch_buffer, bool use_cache, bool prefetch,
     bool pin, BlockCacheLookupContext* lookup_context,
     std::unique_ptr<IndexReader>* index_reader) {
   assert(table != nullptr);
@@ -161,7 +161,7 @@ Status PartitionIndexReader::CacheDependencies(const ReadOptions& ro,
   uint64_t last_off =
       handle.offset() + BlockBasedTable::BlockSizeWithTrailer(handle);
   uint64_t prefetch_len = last_off - prefetch_off;
-  std::unique_ptr<FilePrefetchBuffer> prefetch_buffer;
+  std::unique_ptr<SmartPrefetchBuffer> prefetch_buffer;
   rep->CreateFilePrefetchBuffer(
       0, 0, &prefetch_buffer, false /*Implicit auto readahead*/,
       0 /*num_reads_*/, 0 /*num_file_reads_for_auto_readahead*/);

@@ -202,7 +202,7 @@ bool DBIter::SetBlobValueIfNeeded(const Slice& user_key,
   read_options.fill_cache = fill_cache_;
   read_options.verify_checksums = verify_checksums_;
 
-  constexpr FilePrefetchBuffer* prefetch_buffer = nullptr;
+  constexpr SmartPrefetchBuffer* prefetch_buffer = nullptr;
   constexpr uint64_t* bytes_read = nullptr;
 
   const Status s = version_->GetBlob(read_options, user_key, blob_index,

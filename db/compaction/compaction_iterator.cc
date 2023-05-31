@@ -284,7 +284,7 @@ bool CompactionIterator::InvokeFilterIfNeeded(bool* need_skip,
           return false;
         }
 
-        FilePrefetchBuffer* prefetch_buffer =
+        SmartPrefetchBuffer* prefetch_buffer =
             prefetch_buffers_ ? prefetch_buffers_->GetOrCreatePrefetchBuffer(
                                     blob_index.file_number())
                               : nullptr;
@@ -1131,7 +1131,7 @@ void CompactionIterator::GarbageCollectBlobIfNeeded() {
       return;
     }
 
-    FilePrefetchBuffer* prefetch_buffer =
+    SmartPrefetchBuffer* prefetch_buffer =
         prefetch_buffers_ ? prefetch_buffers_->GetOrCreatePrefetchBuffer(
                                 blob_index.file_number())
                           : nullptr;

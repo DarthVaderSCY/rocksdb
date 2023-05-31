@@ -228,7 +228,7 @@ bool NotifyCollectTableCollectorsOnFinish(
 // cache?
 Status ReadTablePropertiesHelper(
     const ReadOptions& ro, const BlockHandle& handle,
-    RandomAccessFileReader* file, FilePrefetchBuffer* prefetch_buffer,
+    RandomAccessFileReader* file, SmartPrefetchBuffer* prefetch_buffer,
     const Footer& footer, const ImmutableOptions& ioptions,
     std::unique_ptr<TableProperties>* table_properties,
     MemoryAllocator* memory_allocator) {
@@ -415,7 +415,7 @@ Status ReadTableProperties(RandomAccessFileReader* file, uint64_t file_size,
                            const ReadOptions& read_options,
                            std::unique_ptr<TableProperties>* properties,
                            MemoryAllocator* memory_allocator,
-                           FilePrefetchBuffer* prefetch_buffer) {
+                           SmartPrefetchBuffer* prefetch_buffer) {
   BlockHandle block_handle;
   Footer footer;
   Status s =
@@ -478,7 +478,7 @@ Status ReadMetaIndexBlockInFile(RandomAccessFileReader* file,
                                 const ReadOptions& read_options,
                                 BlockContents* metaindex_contents,
                                 MemoryAllocator* memory_allocator,
-                                FilePrefetchBuffer* prefetch_buffer,
+                                SmartPrefetchBuffer* prefetch_buffer,
                                 Footer* footer_out) {
   Footer footer;
   IOOptions opts;
@@ -510,7 +510,7 @@ Status FindMetaBlockInFile(
     uint64_t table_magic_number, const ImmutableOptions& ioptions,
     const ReadOptions& read_options, const std::string& meta_block_name,
     BlockHandle* block_handle, MemoryAllocator* memory_allocator,
-    FilePrefetchBuffer* prefetch_buffer, Footer* footer_out) {
+    SmartPrefetchBuffer* prefetch_buffer, Footer* footer_out) {
   BlockContents metaindex_contents;
   auto s = ReadMetaIndexBlockInFile(
       file, file_size, table_magic_number, ioptions, read_options,
@@ -529,7 +529,7 @@ Status FindMetaBlockInFile(
 }
 
 Status ReadMetaBlock(RandomAccessFileReader* file,
-                     FilePrefetchBuffer* prefetch_buffer, uint64_t file_size,
+                     SmartPrefetchBuffer* prefetch_buffer, uint64_t file_size,
                      uint64_t table_magic_number,
                      const ImmutableOptions& ioptions,
                      const ReadOptions& read_options,

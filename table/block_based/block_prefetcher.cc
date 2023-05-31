@@ -24,7 +24,7 @@ void BlockPrefetcher::PrefetchIfNeeded(
   //           initial_auto_readahead_size_
   //           << ", max_auto_readahead_size="
   //           << rep->table_options.max_auto_readahead_size << std::endl;
-  // num_file_reads is used  by FilePrefetchBuffer only when
+  // num_file_reads is used  by SmartPrefetchBuffer only when
   // implicit_auto_readahead is set.
   if (is_for_compaction) {
     rep->CreateFilePrefetchBufferIfNotExists(
@@ -57,7 +57,7 @@ void BlockPrefetcher::PrefetchIfNeeded(
   }
 
   // In case of no_sequential_checking, it will skip the num_file_reads_ and
-  // will always creates the FilePrefetchBuffer.
+  // will always creates the SmartPrefetchBuffer.
   if (no_sequential_checking) {
     rep->CreateFilePrefetchBufferIfNotExists(
         initial_auto_readahead_size_, max_auto_readahead_size,

@@ -198,7 +198,7 @@ TEST_F(BlobSourceTest, GetBlobsFromCache) {
   ReadOptions read_options;
   read_options.verify_checksums = true;
 
-  constexpr FilePrefetchBuffer* prefetch_buffer = nullptr;
+  constexpr SmartPrefetchBuffer* prefetch_buffer = nullptr;
 
   {
     // GetBlob
@@ -832,7 +832,7 @@ TEST_F(BlobSourceTest, MultiGetBlobsFromCache) {
   ReadOptions read_options;
   read_options.verify_checksums = true;
 
-  constexpr FilePrefetchBuffer* prefetch_buffer = nullptr;
+  constexpr SmartPrefetchBuffer* prefetch_buffer = nullptr;
 
   {
     // MultiGetBlobFromOneFile

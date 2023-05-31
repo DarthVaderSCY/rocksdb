@@ -192,7 +192,7 @@ PartitionedFilterBlockReader::PartitionedFilterBlockReader(
 
 std::unique_ptr<FilterBlockReader> PartitionedFilterBlockReader::Create(
     const BlockBasedTable* table, const ReadOptions& ro,
-    FilePrefetchBuffer* prefetch_buffer, bool use_cache, bool prefetch,
+    SmartPrefetchBuffer* prefetch_buffer, bool use_cache, bool prefetch,
     bool pin, BlockCacheLookupContext* lookup_context) {
   assert(table);
   assert(table->get_rep());
@@ -286,7 +286,7 @@ BlockHandle PartitionedFilterBlockReader::GetFilterPartitionHandle(
 }
 
 Status PartitionedFilterBlockReader::GetFilterPartitionBlock(
-    FilePrefetchBuffer* prefetch_buffer, const BlockHandle& fltr_blk_handle,
+    SmartPrefetchBuffer* prefetch_buffer, const BlockHandle& fltr_blk_handle,
     bool no_io, GetContext* get_context,
     BlockCacheLookupContext* lookup_context, const ReadOptions& _read_options,
     CachableEntry<ParsedFullFilterBlock>* filter_block) const {
@@ -483,7 +483,7 @@ Status PartitionedFilterBlockReader::CacheDependencies(const ReadOptions& ro,
   uint64_t last_off =
       handle.offset() + handle.size() + BlockBasedTable::kBlockTrailerSize;
   uint64_t prefetch_len = last_off - prefetch_off;
-  std::unique_ptr<FilePrefetchBuffer> prefetch_buffer;
+  std::unique_ptr<SmartPrefetchBuffer> prefetch_buffer;
   rep->CreateFilePrefetchBuffer(
       0, 0, &prefetch_buffer, false /* Implicit autoreadahead */,
       0 /*num_reads_*/, 0 /*num_file_reads_for_auto_readahead*/);

@@ -2138,7 +2138,7 @@ Version::Version(ColumnFamilyData* column_family_data, VersionSet* vset,
 
 Status Version::GetBlob(const ReadOptions& read_options, const Slice& user_key,
                         const Slice& blob_index_slice,
-                        FilePrefetchBuffer* prefetch_buffer,
+                        SmartPrefetchBuffer* prefetch_buffer,
                         PinnableSlice* value, uint64_t* bytes_read) const {
   BlobIndex blob_index;
 
@@ -2155,7 +2155,7 @@ Status Version::GetBlob(const ReadOptions& read_options, const Slice& user_key,
 
 Status Version::GetBlob(const ReadOptions& read_options, const Slice& user_key,
                         const BlobIndex& blob_index,
-                        FilePrefetchBuffer* prefetch_buffer,
+                        SmartPrefetchBuffer* prefetch_buffer,
                         PinnableSlice* value, uint64_t* bytes_read) const {
   assert(value);
 
@@ -2386,7 +2386,7 @@ void Version::Get(const ReadOptions& read_options, const LookupKey& k,
           TEST_SYNC_POINT_CALLBACK("Version::Get::TamperWithBlobIndex",
                                    &blob_index);
 
-          constexpr FilePrefetchBuffer* prefetch_buffer = nullptr;
+          constexpr SmartPrefetchBuffer* prefetch_buffer = nullptr;
 
           PinnableSlice result;
 

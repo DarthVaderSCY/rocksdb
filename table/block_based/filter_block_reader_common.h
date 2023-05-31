@@ -14,7 +14,7 @@
 namespace ROCKSDB_NAMESPACE {
 
 class BlockBasedTable;
-class FilePrefetchBuffer;
+class SmartPrefetchBuffer;
 
 // Encapsulates common functionality for the various filter block reader
 // implementations. Provides access to the filter block regardless of whether
@@ -44,7 +44,7 @@ class FilterBlockReaderCommon : public FilterBlockReader {
 
  protected:
   static Status ReadFilterBlock(const BlockBasedTable* table,
-                                FilePrefetchBuffer* prefetch_buffer,
+                                SmartPrefetchBuffer* prefetch_buffer,
                                 const ReadOptions& read_options, bool use_cache,
                                 GetContext* get_context,
                                 BlockCacheLookupContext* lookup_context,

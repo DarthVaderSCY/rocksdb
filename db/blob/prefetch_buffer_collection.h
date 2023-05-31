@@ -11,6 +11,7 @@
 #include <unordered_map>
 
 #include "file/file_prefetch_buffer.h"
+#include "file/smart_prefetch_buffer.h"
 #include "rocksdb/rocksdb_namespace.h"
 
 namespace ROCKSDB_NAMESPACE {
@@ -27,11 +28,11 @@ class PrefetchBufferCollection {
     assert(readahead_size_ > 0);
   }
 
-  FilePrefetchBuffer* GetOrCreatePrefetchBuffer(uint64_t file_number);
+  SmartPrefetchBuffer* GetOrCreatePrefetchBuffer(uint64_t file_number);
 
  private:
   uint64_t readahead_size_;
-  std::unordered_map<uint64_t, std::unique_ptr<FilePrefetchBuffer>>
+  std::unordered_map<uint64_t, std::unique_ptr<SmartPrefetchBuffer>>
       prefetch_buffers_;  // maps file number to prefetch buffer
 };
 

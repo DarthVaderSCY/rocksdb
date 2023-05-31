@@ -15,6 +15,7 @@
 
 #include "file/file_prefetch_buffer.h"
 #include "file/random_access_file_reader.h"
+#include "file/smart_prefetch_buffer.h"
 #include "memory/memory_allocator.h"
 #include "options/cf_options.h"
 #include "port/malloc.h"
@@ -241,7 +242,7 @@ class FooterBuilder {
 // If enforce_table_magic_number != 0, ReadFooterFromFile() will return
 // corruption if table_magic number is not equal to enforce_table_magic_number
 Status ReadFooterFromFile(const IOOptions& opts, RandomAccessFileReader* file,
-                          FileSystem& fs, FilePrefetchBuffer* prefetch_buffer,
+                          FileSystem& fs, SmartPrefetchBuffer* prefetch_buffer,
                           uint64_t file_size, Footer* footer,
                           uint64_t enforce_table_magic_number = 0);
 

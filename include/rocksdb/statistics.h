@@ -580,7 +580,7 @@ enum Histograms : uint32_t {
   // Number of levels requiring IO for MultiGet
   NUM_LEVEL_READ_PER_MULTIGET,
 
-  // Wait time for aborting async read in FilePrefetchBuffer destructor
+  // Wait time for aborting async read in SmartPrefetchBuffer destructor
   ASYNC_PREFETCH_ABORT_MICROS,
 
   // Number of bytes read for RocksDB's prefetching contents (as opposed to file

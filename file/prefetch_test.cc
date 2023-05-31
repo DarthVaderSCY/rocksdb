@@ -6,6 +6,7 @@
 #include "db/db_test_util.h"
 #include "file/file_prefetch_buffer.h"
 #include "file/file_util.h"
+#include "file/smart_prefetch_buffer.h"
 #include "rocksdb/file_system.h"
 #include "test_util/sync_point.h"
 #ifdef GFLAGS
@@ -134,7 +135,7 @@ TEST_P(PrefetchTest, Basic) {
 
   const int kNumKeys = 1100;
   int buff_prefetch_count = 0;
-  SyncPoint::GetInstance()->SetCallBack("FilePrefetchBuffer::Prefetch:Start",
+  SyncPoint::GetInstance()->SetCallBack("SmartPrefetchBuffer::Prefetch:Start",
                                         [&](void*) { buff_prefetch_count++; });
   SyncPoint::GetInstance()->EnableProcessing();
 
@@ -194,13 +195,13 @@ TEST_P(PrefetchTest, Basic) {
 
   if (support_prefetch && !use_direct_io) {
     // If underline file system supports prefetch, and directIO is not enabled
-    // make sure prefetch() is called and FilePrefetchBuffer is not used.
+    // make sure prefetch() is called and SmartPrefetchBuffer is not used.
     ASSERT_TRUE(fs->IsPrefetchCalled());
     fs->ClearPrefetchCount();
     ASSERT_EQ(0, buff_prefetch_count);
   } else {
     // If underline file system doesn't support prefetch, or directIO is
-    // enabled, make sure prefetch() is not called and FilePrefetchBuffer is
+    // enabled, make sure prefetch() is not called and SmartPrefetchBuffer is
     // used.
     ASSERT_FALSE(fs->IsPrefetchCalled());
     ASSERT_GT(buff_prefetch_count, 0);
@@ -257,7 +258,7 @@ TEST_P(PrefetchTest, ConfigureAutoMaxReadaheadSize) {
   options.table_factory.reset(NewBlockBasedTableFactory(table_options));
 
   int buff_prefetch_count = 0;
-  SyncPoint::GetInstance()->SetCallBack("FilePrefetchBuffer::Prefetch:Start",
+  SyncPoint::GetInstance()->SetCallBack("SmartPrefetchBuffer::Prefetch:Start",
                                         [&](void*) { buff_prefetch_count++; });
 
   // DB open will create table readers unless we reduce the table cache
@@ -395,7 +396,7 @@ TEST_P(PrefetchTest, ConfigureInternalAutoReadaheadSize) {
         *max_open_files = 11;
       });
 
-  SyncPoint::GetInstance()->SetCallBack("FilePrefetchBuffer::Prefetch:Start",
+  SyncPoint::GetInstance()->SetCallBack("SmartPrefetchBuffer::Prefetch:Start",
                                         [&](void*) { buff_prefetch_count++; });
 
   SyncPoint::GetInstance()->EnableProcessing();
@@ -513,7 +514,7 @@ TEST_P(PrefetchTest, ConfigureNumFilesReadsForReadaheadSize) {
   options.table_factory.reset(NewBlockBasedTableFactory(table_options));
 
   int buff_prefetch_count = 0;
-  SyncPoint::GetInstance()->SetCallBack("FilePrefetchBuffer::Prefetch:Start",
+  SyncPoint::GetInstance()->SetCallBack("SmartPrefetchBuffer::Prefetch:Start",
                                         [&](void*) { buff_prefetch_count++; });
   SyncPoint::GetInstance()->EnableProcessing();
 
@@ -615,7 +616,7 @@ TEST_P(PrefetchTest, PrefetchWhenReseek) {
   options.table_factory.reset(NewBlockBasedTableFactory(table_options));
 
   int buff_prefetch_count = 0;
-  SyncPoint::GetInstance()->SetCallBack("FilePrefetchBuffer::Prefetch:Start",
+  SyncPoint::GetInstance()->SetCallBack("SmartPrefetchBuffer::Prefetch:Start",
                                         [&](void*) { buff_prefetch_count++; });
   SyncPoint::GetInstance()->EnableProcessing();
 
@@ -879,7 +880,7 @@ TEST_P(PrefetchTest, PrefetchWhenReseekwithCache) {
   options.table_factory.reset(NewBlockBasedTableFactory(table_options));
 
   int buff_prefetch_count = 0;
-  SyncPoint::GetInstance()->SetCallBack("FilePrefetchBuffer::Prefetch:Start",
+  SyncPoint::GetInstance()->SetCallBack("SmartPrefetchBuffer::Prefetch:Start",
                                         [&](void*) { buff_prefetch_count++; });
   SyncPoint::GetInstance()->EnableProcessing();
 
@@ -1021,7 +1022,7 @@ TEST_P(PrefetchTest, DBIterLevelReadAhead) {
   // Test - Iterate over the keys sequentially.
   {
     SyncPoint::GetInstance()->SetCallBack(
-        "FilePrefetchBuffer::Prefetch:Start",
+        "SmartPrefetchBuffer::Prefetch:Start",
         [&](void*) { buff_prefetch_count++; });
 
     // The callback checks, since reads are sequential, readahead_size doesn't
@@ -1037,7 +1038,7 @@ TEST_P(PrefetchTest, DBIterLevelReadAhead) {
         });
 
     SyncPoint::GetInstance()->SetCallBack(
-        "FilePrefetchBuffer::TryReadFromCache", [&](void* arg) {
+        "SmartPrefetchBuffer::TryReadFromCache", [&](void* arg) {
           current_readahead_size = *reinterpret_cast<size_t*>(arg);
           ASSERT_GT(current_readahead_size, 0);
         });
@@ -1120,7 +1121,7 @@ TEST_P(PrefetchTest, DBIterLevelReadAheadWithAsyncIO) {
   // Test - Iterate over the keys sequentially.
   {
     SyncPoint::GetInstance()->SetCallBack(
-        "FilePrefetchBuffer::PrefetchAsyncInternal:Start",
+        "SmartPrefetchBuffer::PrefetchAsyncInternal:Start",
         [&](void*) { buff_async_prefetch_count++; });
 
     // The callback checks, since reads are sequential, readahead_size doesn't
@@ -1136,7 +1137,7 @@ TEST_P(PrefetchTest, DBIterLevelReadAheadWithAsyncIO) {
         });
 
     SyncPoint::GetInstance()->SetCallBack(
-        "FilePrefetchBuffer::TryReadFromCache", [&](void* arg) {
+        "SmartPrefetchBuffer::TryReadFromCache", [&](void* arg) {
           current_readahead_size = *reinterpret_cast<size_t*>(arg);
           ASSERT_GT(current_readahead_size, 0);
         });
@@ -1349,13 +1350,13 @@ TEST_P(PrefetchTest1, NonSequentialReadsWithAdaptiveReadahead) {
   int set_readahead = 0;
   size_t readahead_size = 0;
 
-  SyncPoint::GetInstance()->SetCallBack("FilePrefetchBuffer::Prefetch:Start",
+  SyncPoint::GetInstance()->SetCallBack("SmartPrefetchBuffer::Prefetch:Start",
                                         [&](void*) { buff_prefetch_count++; });
   SyncPoint::GetInstance()->SetCallBack(
       "BlockPrefetcher::SetReadaheadState",
       [&](void* /*arg*/) { set_readahead++; });
   SyncPoint::GetInstance()->SetCallBack(
-      "FilePrefetchBuffer::TryReadFromCache",
+      "SmartPrefetchBuffer::TryReadFromCache",
       [&](void* arg) { readahead_size = *reinterpret_cast<size_t*>(arg); });
 
   SyncPoint::GetInstance()->EnableProcessing();
@@ -1448,10 +1449,10 @@ TEST_P(PrefetchTest1, DecreaseReadAheadIfInCache) {
   size_t expected_current_readahead_size = 8 * 1024;
   size_t decrease_readahead_size = 8 * 1024;
 
-  SyncPoint::GetInstance()->SetCallBack("FilePrefetchBuffer::Prefetch:Start",
+  SyncPoint::GetInstance()->SetCallBack("SmartPrefetchBuffer::Prefetch:Start",
                                         [&](void*) { buff_prefetch_count++; });
   SyncPoint::GetInstance()->SetCallBack(
-      "FilePrefetchBuffer::TryReadFromCache", [&](void* arg) {
+      "SmartPrefetchBuffer::TryReadFromCache", [&](void* arg) {
         current_readahead_size = *reinterpret_cast<size_t*>(arg);
       });
 
@@ -1579,7 +1580,7 @@ TEST_P(PrefetchTest1, SeekParallelizationTest) {
   int buff_prefetch_count = 0;
 
   SyncPoint::GetInstance()->SetCallBack(
-      "FilePrefetchBuffer::PrefetchAsyncInternal:Start",
+      "SmartPrefetchBuffer::PrefetchAsyncInternal:Start",
       [&](void*) { buff_prefetch_count++; });
 
   SyncPoint::GetInstance()->EnableProcessing();
@@ -1713,7 +1714,7 @@ TEST_P(PrefetchTest, ReadAsyncWithPosixFS) {
   }
 
   SyncPoint::GetInstance()->SetCallBack(
-      "FilePrefetchBuffer::PrefetchAsyncInternal:Start",
+      "SmartPrefetchBuffer::PrefetchAsyncInternal:Start",
       [&](void*) { buff_prefetch_count++; });
 
   SyncPoint::GetInstance()->SetCallBack(
@@ -1838,7 +1839,7 @@ TEST_P(PrefetchTest, MultipleSeekWithPosixFS) {
   }
 
   SyncPoint::GetInstance()->SetCallBack(
-      "FilePrefetchBuffer::PrefetchAsyncInternal:Start",
+      "SmartPrefetchBuffer::PrefetchAsyncInternal:Start",
       [&](void*) { buff_prefetch_count++; });
 
   SyncPoint::GetInstance()->SetCallBack(
@@ -1966,7 +1967,7 @@ TEST_P(PrefetchTest, SeekParallelizationTestWithPosix) {
   int buff_prefetch_count = 0;
 
   SyncPoint::GetInstance()->SetCallBack(
-      "FilePrefetchBuffer::PrefetchAsyncInternal:Start",
+      "SmartPrefetchBuffer::PrefetchAsyncInternal:Start",
       [&](void*) { buff_prefetch_count++; });
 
   bool read_async_called = false;
@@ -2088,7 +2089,7 @@ TEST_P(PrefetchTest, TraceReadAsyncWithCallbackWrapper) {
   }
 
   SyncPoint::GetInstance()->SetCallBack(
-      "FilePrefetchBuffer::PrefetchAsyncInternal:Start",
+      "SmartPrefetchBuffer::PrefetchAsyncInternal:Start",
       [&](void*) { buff_prefetch_count++; });
 
   SyncPoint::GetInstance()->SetCallBack(
@@ -2205,7 +2206,7 @@ TEST_F(FilePrefetchBufferTest, SeekWithBlockCacheHit) {
   std::unique_ptr<RandomAccessFileReader> r;
   Read(fname, opts, &r);
 
-  FilePrefetchBuffer fpb(16384, 16384, true, false, false, 0, 0, fs());
+  SmartPrefetchBuffer fpb(16384, 16384, true, false, false, 0, 0, fs());
   Slice result;
   // Simulate a seek of 4096 bytes at offset 0. Due to the readahead settings,
   // it will do two reads of 4096+8192 and 8192
@@ -2235,14 +2236,14 @@ TEST_F(FilePrefetchBufferTest, NoSyncWithAsyncIO) {
   std::unique_ptr<RandomAccessFileReader> r;
   Read(fname, opts, &r);
 
-  FilePrefetchBuffer fpb(
+  SmartPrefetchBuffer fpb(
       /*readahead_size=*/8192, /*max_readahead_size=*/16384, /*enable=*/true,
       /*track_min_offset=*/false, /*implicit_auto_readahead=*/false,
       /*num_file_reads=*/0, /*num_file_reads_for_auto_readahead=*/0, fs());
 
   int read_async_called = 0;
   SyncPoint::GetInstance()->SetCallBack(
-      "FilePrefetchBuffer::ReadAsync",
+      "SmartPrefetchBuffer::ReadAsync",
       [&](void* /*arg*/) { read_async_called++; });
   SyncPoint::GetInstance()->EnableProcessing();
 

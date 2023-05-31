@@ -11,7 +11,7 @@ class AdaptivePrefetcher {
   void PrefetchIfNeeded(const BlockBasedTable::Rep* rep,
                         const BlockHandle& handle, size_t prefetch_size);
 
-  FilePrefetchBuffer* prefetch_buffer() { return prefetch_buffer_.get(); }
+  SmartPrefetchBuffer* prefetch_buffer() { return prefetch_buffer_.get(); }
 
   void UpdateReadPattern(const size_t& offset, const size_t& len) {
     prev_offset_ = offset;
@@ -39,6 +39,6 @@ class AdaptivePrefetcher {
   // info of prev read, for judging if the read pattern is sequential
   size_t prev_offset_ = 0;
   size_t prev_len_ = 0;
-  std::unique_ptr<FilePrefetchBuffer> prefetch_buffer_;
+  std::unique_ptr<SmartPrefetchBuffer> prefetch_buffer_;
 };
 }  // namespace ROCKSDB_NAMESPACE

@@ -136,7 +136,7 @@ bool FullFilterBlockReader::KeyMayMatch(const Slice& key, const bool no_io,
 
 std::unique_ptr<FilterBlockReader> FullFilterBlockReader::Create(
     const BlockBasedTable* table, const ReadOptions& ro,
-    FilePrefetchBuffer* prefetch_buffer, bool use_cache, bool prefetch,
+    SmartPrefetchBuffer* prefetch_buffer, bool use_cache, bool prefetch,
     bool pin, BlockCacheLookupContext* lookup_context) {
   assert(table);
   assert(table->get_rep());

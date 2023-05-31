@@ -282,7 +282,7 @@ class BlockBasedTable : public TableReader {
                                    TBlockIter* input_iter, BlockType block_type,
                                    GetContext* get_context,
                                    BlockCacheLookupContext* lookup_context,
-                                   FilePrefetchBuffer* prefetch_buffer,
+                                   SmartPrefetchBuffer* prefetch_buffer,
                                    bool for_compaction, bool async_read,
                                    Status& s) const;
 
@@ -337,7 +337,7 @@ class BlockBasedTable : public TableReader {
   //    block.
   template <typename TBlocklike>
   WithBlocklikeCheck<Status, TBlocklike> MaybeReadBlockAndLoadToCache(
-      FilePrefetchBuffer* prefetch_buffer, const ReadOptions& ro,
+      SmartPrefetchBuffer* prefetch_buffer, const ReadOptions& ro,
       const BlockHandle& handle, const UncompressionDict& uncompression_dict,
       bool for_compaction, CachableEntry<TBlocklike>* block_entry,
       GetContext* get_context, BlockCacheLookupContext* lookup_context,
@@ -348,7 +348,7 @@ class BlockBasedTable : public TableReader {
   // read options allow I/O).
   template <typename TBlocklike>
   WithBlocklikeCheck<Status, TBlocklike> RetrieveBlock(
-      FilePrefetchBuffer* prefetch_buffer, const ReadOptions& ro,
+      SmartPrefetchBuffer* prefetch_buffer, const ReadOptions& ro,
       const BlockHandle& handle, const UncompressionDict& uncompression_dict,
       CachableEntry<TBlocklike>* block_entry, GetContext* get_context,
       BlockCacheLookupContext* lookup_context, bool for_compaction,
@@ -432,7 +432,7 @@ class BlockBasedTable : public TableReader {
   // need to access extra meta blocks for index construction. This parameter
   // helps avoid re-reading meta index block if caller already created one.
   Status CreateIndexReader(const ReadOptions& ro,
-                           FilePrefetchBuffer* prefetch_buffer,
+                           SmartPrefetchBuffer* prefetch_buffer,
                            InternalIterator* preloaded_meta_index_iter,
                            bool use_cache, bool prefetch, bool pin,
                            BlockCacheLookupContext* lookup_context,
@@ -457,22 +457,22 @@ class BlockBasedTable : public TableReader {
       const ReadOptions& ro, RandomAccessFileReader* file, uint64_t file_size,
       bool force_direct_prefetch, TailPrefetchStats* tail_prefetch_stats,
       const bool prefetch_all, const bool preload_all,
-      std::unique_ptr<FilePrefetchBuffer>* prefetch_buffer, Statistics* stats);
+      std::unique_ptr<SmartPrefetchBuffer>* prefetch_buffer, Statistics* stats);
   Status ReadMetaIndexBlock(const ReadOptions& ro,
-                            FilePrefetchBuffer* prefetch_buffer,
+                            SmartPrefetchBuffer* prefetch_buffer,
                             std::unique_ptr<Block>* metaindex_block,
                             std::unique_ptr<InternalIterator>* iter);
   Status ReadPropertiesBlock(const ReadOptions& ro,
-                             FilePrefetchBuffer* prefetch_buffer,
+                             SmartPrefetchBuffer* prefetch_buffer,
                              InternalIterator* meta_iter,
                              const SequenceNumber largest_seqno);
   Status ReadRangeDelBlock(const ReadOptions& ro,
-                           FilePrefetchBuffer* prefetch_buffer,
+                           SmartPrefetchBuffer* prefetch_buffer,
                            InternalIterator* meta_iter,
                            const InternalKeyComparator& internal_comparator,
                            BlockCacheLookupContext* lookup_context);
   Status PrefetchIndexAndFilterBlocks(
-      const ReadOptions& ro, FilePrefetchBuffer* prefetch_buffer,
+      const ReadOptions& ro, SmartPrefetchBuffer* prefetch_buffer,
       InternalIterator* meta_iter, BlockBasedTable* new_table,
       bool prefetch_all, const BlockBasedTableOptions& table_options,
       const int level, size_t file_size, size_t max_file_size_for_l0_meta_pin,
@@ -487,7 +487,7 @@ class BlockBasedTable : public TableReader {
 
   // Create the filter from the filter block.
   std::unique_ptr<FilterBlockReader> CreateFilterBlockReader(
-      const ReadOptions& ro, FilePrefetchBuffer* prefetch_buffer,
+      const ReadOptions& ro, SmartPrefetchBuffer* prefetch_buffer,
       bool use_cache, bool prefetch, bool pin,
       BlockCacheLookupContext* lookup_context);
 
@@ -668,10 +668,10 @@ struct BlockBasedTable::Rep {
   }
   void CreateFilePrefetchBuffer(
       size_t readahead_size, size_t max_readahead_size,
-      std::unique_ptr<FilePrefetchBuffer>* fpb, bool implicit_auto_readahead,
+      std::unique_ptr<SmartPrefetchBuffer>* fpb, bool implicit_auto_readahead,
       uint64_t num_file_reads,
       uint64_t num_file_reads_for_auto_readahead) const {
-    fpb->reset(new FilePrefetchBuffer(
+    fpb->reset(new SmartPrefetchBuffer(
         readahead_size, max_readahead_size,
         !ioptions.allow_mmap_reads /* enable */, false /* track_min_offset */,
         implicit_auto_readahead, num_file_reads,
@@ -681,13 +681,37 @@ struct BlockBasedTable::Rep {
 
   void CreateFilePrefetchBufferIfNotExists(
       size_t readahead_size, size_t max_readahead_size,
-      std::unique_ptr<FilePrefetchBuffer>* fpb, bool implicit_auto_readahead,
+      std::unique_ptr<SmartPrefetchBuffer>* fpb, bool implicit_auto_readahead,
       uint64_t num_file_reads,
       uint64_t num_file_reads_for_auto_readahead) const {
     if (!(*fpb)) {
       CreateFilePrefetchBuffer(readahead_size, max_readahead_size, fpb,
                                implicit_auto_readahead, num_file_reads,
                                num_file_reads_for_auto_readahead);
+    }
+  }
+
+  void CreateSmartPrefetchBuffer(
+      size_t readahead_size, size_t max_readahead_size,
+      std::unique_ptr<SmartPrefetchBuffer>* fpb, bool implicit_auto_readahead,
+      uint64_t num_file_reads,
+      uint64_t num_file_reads_for_auto_readahead) const {
+    fpb->reset(new SmartPrefetchBuffer(
+        readahead_size, max_readahead_size, !ioptions.allow_mmap_reads, false,
+        implicit_auto_readahead, num_file_reads,
+        num_file_reads_for_auto_readahead, ioptions.fs.get(), ioptions.clock,
+        ioptions.stats));
+  }
+
+  void CreateSmartPrefetchBufferIfNotExists(
+      size_t readahead_size, size_t max_readahead_size,
+      std::unique_ptr<SmartPrefetchBuffer>* spb, bool implicit_auto_readahead,
+      uint64_t num_file_reads,
+      uint64_t num_file_reads_for_auto_readahead) const {
+    if (!(*spb)) {
+      CreateSmartPrefetchBuffer(readahead_size, max_readahead_size, spb,
+                                implicit_auto_readahead, num_file_reads,
+                                num_file_reads_for_auto_readahead);
     }
   }
 

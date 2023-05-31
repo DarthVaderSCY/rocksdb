@@ -180,7 +180,7 @@ TEST_F(BlobFileReaderTest, CreateReaderAndGetBlob) {
   // Make sure the blob can be retrieved with and without checksum verification
   read_options.verify_checksums = false;
 
-  constexpr FilePrefetchBuffer* prefetch_buffer = nullptr;
+  constexpr SmartPrefetchBuffer* prefetch_buffer = nullptr;
   constexpr MemoryAllocator* allocator = nullptr;
 
   {
@@ -679,7 +679,7 @@ TEST_F(BlobFileReaderTest, BlobCRCError) {
 
   SyncPoint::GetInstance()->EnableProcessing();
 
-  constexpr FilePrefetchBuffer* prefetch_buffer = nullptr;
+  constexpr SmartPrefetchBuffer* prefetch_buffer = nullptr;
   constexpr MemoryAllocator* allocator = nullptr;
 
   std::unique_ptr<BlobContents> value;
@@ -736,7 +736,7 @@ TEST_F(BlobFileReaderTest, Compression) {
   // Make sure the blob can be retrieved with and without checksum verification
   read_options.verify_checksums = false;
 
-  constexpr FilePrefetchBuffer* prefetch_buffer = nullptr;
+  constexpr SmartPrefetchBuffer* prefetch_buffer = nullptr;
   constexpr MemoryAllocator* allocator = nullptr;
 
   {
@@ -818,7 +818,7 @@ TEST_F(BlobFileReaderTest, UncompressionError) {
 
   SyncPoint::GetInstance()->EnableProcessing();
 
-  constexpr FilePrefetchBuffer* prefetch_buffer = nullptr;
+  constexpr SmartPrefetchBuffer* prefetch_buffer = nullptr;
   constexpr MemoryAllocator* allocator = nullptr;
 
   std::unique_ptr<BlobContents> value;
@@ -907,7 +907,7 @@ TEST_P(BlobFileReaderIOErrorTest, IOError) {
   } else {
     ASSERT_OK(s);
 
-    constexpr FilePrefetchBuffer* prefetch_buffer = nullptr;
+    constexpr SmartPrefetchBuffer* prefetch_buffer = nullptr;
     constexpr MemoryAllocator* allocator = nullptr;
 
     std::unique_ptr<BlobContents> value;
@@ -995,7 +995,7 @@ TEST_P(BlobFileReaderDecodingErrorTest, DecodingError) {
   } else {
     ASSERT_OK(s);
 
-    constexpr FilePrefetchBuffer* prefetch_buffer = nullptr;
+    constexpr SmartPrefetchBuffer* prefetch_buffer = nullptr;
     constexpr MemoryAllocator* allocator = nullptr;
 
     std::unique_ptr<BlobContents> value;

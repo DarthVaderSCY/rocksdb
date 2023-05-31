@@ -564,7 +564,7 @@ void GetContext::MergeWithEntity(Slice entity) {
 
 bool GetContext::GetBlobValue(const Slice& user_key, const Slice& blob_index,
                               PinnableSlice* blob_value) {
-  constexpr FilePrefetchBuffer* prefetch_buffer = nullptr;
+  constexpr SmartPrefetchBuffer* prefetch_buffer = nullptr;
   constexpr uint64_t* bytes_read = nullptr;
 
   Status status = blob_fetcher_->FetchBlob(

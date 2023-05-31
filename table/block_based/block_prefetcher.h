@@ -23,7 +23,7 @@ class BlockPrefetcher {
                         bool is_for_compaction,
                         const bool no_sequential_checking,
                         Env::IOPriority rate_limiter_priority);
-  FilePrefetchBuffer* prefetch_buffer() { return prefetch_buffer_.get(); }
+  SmartPrefetchBuffer* prefetch_buffer() { return prefetch_buffer_.get(); }
 
   void UpdateReadPattern(const uint64_t& offset, const size_t& len) {
     prev_offset_ = offset;
@@ -67,6 +67,6 @@ class BlockPrefetcher {
   uint64_t num_file_reads_ = 0;
   uint64_t prev_offset_ = 0;
   size_t prev_len_ = 0;
-  std::unique_ptr<FilePrefetchBuffer> prefetch_buffer_;
+  std::unique_ptr<SmartPrefetchBuffer> prefetch_buffer_;
 };
 }  // namespace ROCKSDB_NAMESPACE

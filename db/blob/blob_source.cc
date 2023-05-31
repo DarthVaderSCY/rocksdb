@@ -81,8 +81,8 @@ Status BlobSource::PutBlobIntoCache(
   assert(cached_blob->IsEmpty());
 
   TypedHandle* cache_handle = nullptr;
-  const Status s = InsertEntryIntoCache(cache_key, blob->get(),
-                                        &cache_handle, Cache::Priority::BOTTOM);
+  const Status s = InsertEntryIntoCache(cache_key, blob->get(), &cache_handle,
+                                        Cache::Priority::BOTTOM);
   if (s.ok()) {
     blob->release();
 
@@ -159,7 +159,7 @@ Status BlobSource::GetBlob(const ReadOptions& read_options,
                            uint64_t offset, uint64_t file_size,
                            uint64_t value_size,
                            CompressionType compression_type,
-                           FilePrefetchBuffer* prefetch_buffer,
+                           SmartPrefetchBuffer* prefetch_buffer,
                            PinnableSlice* value, uint64_t* bytes_read) {
   assert(value);
 
