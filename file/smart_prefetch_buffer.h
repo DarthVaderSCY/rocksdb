@@ -5,7 +5,6 @@
 #include <sstream>
 #include <string>
 
-#include "file/file_prefetch_buffer.h"
 #include "file/readahead_file_info.h"
 #include "monitoring/statistics.h"
 #include "port/port.h"
@@ -23,7 +22,28 @@ namespace ROCKSDB_NAMESPACE {
 struct IOOptions;
 class RandomAccessFileReader;
 
-struct BufferInfo;
+struct SmartBufferInfo {
+  AlignedBuffer buffer_;
+
+  uint64_t offset_ = 0;
+
+  // Below parameters are used in case of async read flow.
+  // Length requested for in ReadAsync.
+  size_t async_req_len_ = 0;
+
+  // async_read_in_progress can be used as mutex. Callback can update the buffer
+  // and its size but async_read_in_progress is only set by main thread.
+  bool async_read_in_progress_ = false;
+
+  // io_handle is allocated and used by underlying file system in case of
+  // asynchronous reads.
+  void* io_handle_ = nullptr;
+
+  IOHandleDeleter del_fn_ = nullptr;
+
+  // pos represents the index of this buffer in vector of BufferInfo.
+  uint32_t pos_ = 0;
+};
 
 enum class SmartPrefetchBufferUsage {
   kTableOpenPrefetchTail,
@@ -393,7 +413,7 @@ class SmartPrefetchBuffer {
                                       Status* status,
                                       Env::IOPriority rate_limiter_priority);
 
-  std::vector<BufferInfo> bufs_;
+  std::vector<SmartBufferInfo> bufs_;
   // curr_ represents the index for bufs_ indicating which buffer is being
   // consumed currently.
   uint32_t curr_;

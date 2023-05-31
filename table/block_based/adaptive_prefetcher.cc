@@ -8,11 +8,15 @@ void AdaptivePrefetcher::PrefetchIfNeeded(const BlockBasedTable::Rep* rep,
                                           const BlockHandle& handle,
                                           const size_t prefetch_size) {
   // fixed_size prefetch
-  if (prefetch_size > 0) {
-    rep->CreateSmartPrefetchBufferIfNotExists(prefetch_size, prefetch_size,
-                                              &prefetch_buffer_, false, 0, 0);
-    return;
-  }
+  rep->CreateSmartPrefetchBufferIfNotExists(8388608, 8388608, &prefetch_buffer_,
+                                            false, 0, 0);
+  return;
+  // if (prefetch_size > 0) {
+  //   rep->CreateSmartPrefetchBufferIfNotExists(prefetch_size, prefetch_size,
+  //                                             &prefetch_buffer_, false, 0,
+  //                                             0);
+  //   return;
+  // }
 
   // Adaptive auto prefetch, which will be enabled if the number of reads
   // reached 2 and scans are sequential.
