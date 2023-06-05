@@ -16,6 +16,7 @@ void AdaptivePrefetcher::InitPrefetchBuffer(const BlockBasedTable::Rep* rep,
 
   // Adaptive auto prefetch, which will be enabled if the number of reads
   // reached 2 and scans are sequential.
+  // TODO: determine max_auto_prefetch_size_ by actual performance
   size_t len = BlockBasedTable::BlockSizeWithTrailer(handle);
   size_t offset = handle.offset();
   max_auto_prefetch_size_ = rep->table_options.max_auto_readahead_size;
