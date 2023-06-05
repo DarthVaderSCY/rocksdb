@@ -9,7 +9,7 @@ void AdaptivePrefetcher::InitPrefetchBuffer(const BlockBasedTable::Rep* rep,
                                             const size_t prefetch_size) {
   // fixed_size prefetch
   if (prefetch_size > 0) {
-    rep->CreateSmartPrefetchBufferIfNotExists(8388608, 8388608,
+    rep->CreateSmartPrefetchBufferIfNotExists(prefetch_size, prefetch_size,
                                               &prefetch_buffer_, false, 0, 0);
     return;
   }
