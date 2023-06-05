@@ -14,13 +14,6 @@ void AdaptivePrefetcher::InitPrefetchBuffer(const BlockBasedTable::Rep* rep,
     return;
   }
 
-  // if (prefetch_size > 0) {
-  //   rep->CreateSmartPrefetchBufferIfNotExists(prefetch_size, prefetch_size,
-  //                                             &prefetch_buffer_, false, 0,
-  //                                             0);
-  //   return;
-  // }
-
   // Adaptive auto prefetch, which will be enabled if the number of reads
   // reached 2 and scans are sequential.
   size_t len = BlockBasedTable::BlockSizeWithTrailer(handle);
