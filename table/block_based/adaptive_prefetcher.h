@@ -8,8 +8,8 @@ class AdaptivePrefetcher {
       : prefetch_size_(initial_auto_prefetch_size),
         initial_auto_prefetch_size_(initial_auto_prefetch_size) {}
 
-  void PrefetchIfNeeded(const BlockBasedTable::Rep* rep,
-                        const BlockHandle& handle, size_t prefetch_size);
+  void InitPrefetchBuffer(const BlockBasedTable::Rep* rep,
+                          const BlockHandle& handle, size_t prefetch_size);
 
   SmartPrefetchBuffer* prefetch_buffer() { return prefetch_buffer_.get(); }
 

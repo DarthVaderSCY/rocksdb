@@ -260,8 +260,8 @@ void BlockBasedTableIterator::InitDataBlock() {
     //     is_for_compaction,
     //     /*no_sequential_checking=*/false,
     //     read_options_.rate_limiter_priority);
-    adaptive_prefetcher_.PrefetchIfNeeded(rep, data_block_handle,
-                                          read_options_.readahead_size);
+    adaptive_prefetcher_.InitPrefetchBuffer(rep, data_block_handle,
+                                            read_options_.readahead_size);
     Status s;
     table_->NewDataBlockIterator<DataBlockIter>(
         read_options_, data_block_handle, &block_iter_, BlockType::kData,

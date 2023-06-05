@@ -4,13 +4,16 @@
 #include "table/block_based/block_based_table_reader.h"
 
 namespace ROCKSDB_NAMESPACE {
-void AdaptivePrefetcher::PrefetchIfNeeded(const BlockBasedTable::Rep* rep,
-                                          const BlockHandle& handle,
-                                          const size_t prefetch_size) {
+void AdaptivePrefetcher::InitPrefetchBuffer(const BlockBasedTable::Rep* rep,
+                                            const BlockHandle& handle,
+                                            const size_t prefetch_size) {
   // fixed_size prefetch
-  rep->CreateSmartPrefetchBufferIfNotExists(8388608, 8388608, &prefetch_buffer_,
-                                            false, 0, 0);
-  return;
+  if (prefetch_size > 0) {
+    rep->CreateSmartPrefetchBufferIfNotExists(8388608, 8388608,
+                                              &prefetch_buffer_, false, 0, 0);
+    return;
+  }
+
   // if (prefetch_size > 0) {
   //   rep->CreateSmartPrefetchBufferIfNotExists(prefetch_size, prefetch_size,
   //                                             &prefetch_buffer_, false, 0,
@@ -22,6 +25,7 @@ void AdaptivePrefetcher::PrefetchIfNeeded(const BlockBasedTable::Rep* rep,
   // reached 2 and scans are sequential.
   size_t len = BlockBasedTable::BlockSizeWithTrailer(handle);
   size_t offset = handle.offset();
+  max_auto_prefetch_size_ = rep->table_options.max_auto_readahead_size;
 
   if (!IsBlockSequential(offset)) {
     UpdateReadPattern(offset, len);
@@ -35,9 +39,9 @@ void AdaptivePrefetcher::PrefetchIfNeeded(const BlockBasedTable::Rep* rep,
     return;
   }
 
-  rep->CreateSmartPrefetchBufferIfNotExists(
-      initial_auto_prefetch_size_, max_auto_prefetch_size_, &prefetch_buffer_,
-      true, num_file_reads_, 2);
+  rep->CreateSmartPrefetchBufferIfNotExists(initial_auto_prefetch_size_,
+                                            8388608, &prefetch_buffer_, true,
+                                            num_file_reads_, 2);
   return;
 }
 }  // namespace ROCKSDB_NAMESPACE
