@@ -37,6 +37,7 @@ void SmartPrefetchBuffer::CalculateOffsetAndLen(size_t alignment,
     assert(chunk_offset_in_buffer + chunk_len <=
            bufs_[index].offset_ + bufs_[index].buffer_.CurrentSize());
     if (chunk_len > 0) {
+      // some data([offset, offset+chunk_len]) are in buffer
       copy_data_to_new_buffer = true;
     } else {
       // this reset is not necessary, but just to be safe.
@@ -76,6 +77,7 @@ Status SmartPrefetchBuffer::Read(const IOOptions& opts,
                                  uint64_t read_len, uint64_t chunk_len,
                                  uint64_t rounddown_start, uint32_t index) {
   Slice result;
+  // read data into buffer start
   Status s = reader->Read(opts, rounddown_start + chunk_len, read_len, &result,
                           bufs_[index].buffer_.BufferStart() + chunk_len,
                           /*aligned_buf=*/nullptr, rate_limiter_priority);
@@ -134,8 +136,7 @@ Status SmartPrefetchBuffer::Prefetch(const IOOptions& opts,
   TEST_SYNC_POINT("SmartPrefetchBuffer::Prefetch:Start");
 
   if (offset + n <= bufs_[curr_].offset_ + bufs_[curr_].buffer_.CurrentSize()) {
-    // All requested bytes are already in the curr_ buffer. So no need to Read
-    // again.
+    // All requested bytes are already in the curr_ buffer.
     return Status::OK();
   }
 
@@ -621,14 +622,15 @@ bool SmartPrefetchBuffer::TryReadFromCacheUntracked(
   if (track_min_offset_ && offset < min_offset_read_) {
     min_offset_read_ = static_cast<size_t>(offset);
   }
+  // If requested offset is smaller, pass
   if (!enable_ || (offset < bufs_[curr_].offset_)) {
     return false;
   }
 
   // If the buffer contains only a few of the requested bytes:
-  //    If readahead is enabled: prefetch the remaining bytes + readahead bytes
-  //        and satisfy the request.
-  //    If readahead is not enabled: return false.
+  // If readahead_size_ > 0: prefetch the remaining bytes + readahead bytes
+  // to satisfy the request.
+  // else: return false.
   TEST_SYNC_POINT_CALLBACK("SmartPrefetchBuffer::TryReadFromCache",
                            &readahead_size_);
   if (offset + n > bufs_[curr_].offset_ + bufs_[curr_].buffer_.CurrentSize()) {
@@ -642,7 +644,6 @@ bool SmartPrefetchBuffer::TryReadFromCacheUntracked(
       } else {
         if (implicit_auto_readahead_) {
           if (!IsEligibleForPrefetch(offset, n)) {
-            // Ignore status as Prefetch is not called.
             s.PermitUncheckedError();
             return false;
           }
@@ -659,6 +660,7 @@ bool SmartPrefetchBuffer::TryReadFromCacheUntracked(
 #endif
         return false;
       }
+      // TODO: determine max_readahead_size_ according to performance
       readahead_size_ = std::min(max_readahead_size_, readahead_size_ * 2);
     } else {
       return false;
@@ -666,6 +668,7 @@ bool SmartPrefetchBuffer::TryReadFromCacheUntracked(
   }
   UpdateReadPattern(offset, n, false /*decrease_readaheadsize*/);
 
+  // result=[bufstart_ + offset_in_buffer, bufstart_ + offset_in_buffer + n]
   uint64_t offset_in_buffer = offset - bufs_[curr_].offset_;
   *result = Slice(bufs_[curr_].buffer_.BufferStart() + offset_in_buffer, n);
   return true;
