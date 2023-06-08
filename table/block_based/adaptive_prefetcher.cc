@@ -22,10 +22,10 @@ void AdaptivePrefetcher::InitPrefetchBuffer(const BlockBasedTable::Rep* rep,
 
   // If max_auto_readahead_size is set to be 0, no data will be prefetched.
   max_auto_prefetch_size_ = rep->table_options.max_auto_readahead_size;
-  if (max_auto_prefetch_size_ == 0 {
+  if (max_auto_prefetch_size_ == 0) {
     return;
   }
-  
+
   if (!IsBlockSequential(offset)) {
     UpdateReadPattern(offset, len);
     ResetPrefetchSize(initial_auto_prefetch_size_);
