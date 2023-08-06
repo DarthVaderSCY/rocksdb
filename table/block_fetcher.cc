@@ -72,12 +72,20 @@ inline bool BlockFetcher::TryGetFromPrefetchBuffer() {
   if (prefetch_buffer_ != nullptr) {
     IOOptions opts;
     IOStatus io_s = file_->PrepareIOOptions(read_options_, opts);
+
     if (io_s.ok()) {
+      // std::cout << "here" << std::endl;
       bool read_from_prefetch_buffer = false;
+      // std::cout << read_options_.async_io << std::endl;
       if (read_options_.async_io && !for_compaction_) {
+        // if (true && !for_compaction_) {
+        //  std::cout << "async" << std::endl;
         read_from_prefetch_buffer = prefetch_buffer_->TryReadFromCacheAsync(
             opts, file_, handle_.offset(), block_size_with_trailer_, &slice_,
             &io_s, read_options_.rate_limiter_priority);
+        // std::cout << "read_from_prefetch_buffer:" <<
+        // read_from_prefetch_buffer
+        //           << std::endl;
       } else {
         // std::cout << "call TryReadFromCache()" << std::endl;
         read_from_prefetch_buffer = prefetch_buffer_->TryReadFromCache(

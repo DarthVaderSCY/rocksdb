@@ -2049,9 +2049,9 @@ Status BlockBasedTable::Get(const ReadOptions& read_options, const Slice& key,
                             GetContext* get_context,
                             const SliceTransform* prefix_extractor,
                             bool skip_filters) {
-  std::cout << "call BlockBasedTable::Get" << std::endl;
-  // Similar to Bloom filter !may_match
-  // If timestamp is beyond the range of the table, skip
+  // std::cout << "call BlockBasedTable::Get" << std::endl;
+  //  Similar to Bloom filter !may_match
+  //  If timestamp is beyond the range of the table, skip
   if (!TimestampMayMatch(read_options)) {
     return Status::OK();
   }

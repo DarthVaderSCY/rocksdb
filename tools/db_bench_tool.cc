@@ -27,6 +27,7 @@
 #include <sys/sysctl.h>
 #endif
 #include <atomic>
+#include <chrono>
 #include <cinttypes>
 #include <condition_variable>
 #include <cstddef>
@@ -1166,6 +1167,8 @@ DEFINE_bool(rate_limit_auto_wal_flush, false,
 DEFINE_bool(async_io, false,
             "When set true, RocksDB does asynchronous reads for internal auto "
             "readahead prefetching.");
+
+DEFINE_bool(async_prefetch, false, "async prefetching");
 
 DEFINE_bool(optimize_multiget_for_io, true,
             "When set true, RocksDB does asynchronous reads for SST files in "
@@ -3312,6 +3315,7 @@ class Benchmark {
       read_options_.readahead_size = FLAGS_readahead_size;
       read_options_.adaptive_readahead = FLAGS_adaptive_readahead;
       read_options_.async_io = FLAGS_async_io;
+      read_options_.async_prefetch = FLAGS_async_prefetch;
       read_options_.optimize_multiget_for_io = FLAGS_optimize_multiget_for_io;
 
       void (Benchmark::*method)(ThreadState*) = nullptr;
@@ -5699,6 +5703,7 @@ class Benchmark {
 
     options.adaptive_readahead = FLAGS_adaptive_readahead;
     options.async_io = FLAGS_async_io;
+    options.async_prefetch = FLAGS_async_prefetch;
 
     Iterator* iter = db->NewIterator(options);
     int64_t i = 0;
@@ -5707,6 +5712,16 @@ class Benchmark {
       bytes += iter->key().size() + iter->value().size();
       thread->stats.FinishedOps(nullptr, db, 1, kRead);
       ++i;
+      // for (int j = 0; j < 1000; ++j) {
+      //   for (int k = 0; k < 1000; ++k) {
+      //     int l = j + k;
+      //   }
+      // }
+      if (!options.async_prefetch) {
+        if (i % 1000 == 1) {
+          std::this_thread::sleep_for(std::chrono::milliseconds(1));
+        }
+      }
 
       if (thread->shared->read_rate_limiter.get() != nullptr &&
           i % 1024 == 1023) {
@@ -6680,6 +6695,11 @@ class Benchmark {
 
       for (int j = 0; j < FLAGS_seek_nexts && iter_to_use->Valid(); ++j) {
         // Copy out iterator's value to make sure we read them.
+        if (!FLAGS_async_prefetch) {
+          if (j % 1000 == 1) {
+            std::this_thread::sleep_for(std::chrono::milliseconds(1));
+          }
+        }
         Slice value = iter_to_use->value();
         memcpy(value_buffer, value.data(),
                std::min(value.size(), sizeof(value_buffer)));

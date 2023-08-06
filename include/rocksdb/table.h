@@ -583,7 +583,7 @@ struct BlockBasedTableOptions {
   // change.
   //
   // Default: 256 KB (256 * 1024).
-  size_t max_auto_readahead_size = 256 * 1024;
+  size_t max_auto_readahead_size = 8 * 1024 * 1024;
 
   // If enabled, prepopulate warm/hot blocks (data, uncompressed dict, index and
   // filter blocks) which are already in memory into block cache at the time of
@@ -670,7 +670,6 @@ struct BlockBasedTablePropertyNames {
 // Create default block based table factory.
 extern TableFactory* NewBlockBasedTableFactory(
     const BlockBasedTableOptions& table_options = BlockBasedTableOptions());
-
 
 enum EncodingType : char {
   // Always write full keys without any special encoding.
@@ -827,7 +826,6 @@ struct CuckooTableOptions {
 extern TableFactory* NewCuckooTableFactory(
     const CuckooTableOptions& table_options = CuckooTableOptions());
 
-
 class RandomAccessFileReader;
 
 // A base class for table factories.
@@ -922,6 +920,5 @@ extern TableFactory* NewAdaptiveTableFactory(
     std::shared_ptr<TableFactory> block_based_table_factory = nullptr,
     std::shared_ptr<TableFactory> plain_table_factory = nullptr,
     std::shared_ptr<TableFactory> cuckoo_table_factory = nullptr);
-
 
 }  // namespace ROCKSDB_NAMESPACE

@@ -5,6 +5,7 @@
 
 #include "db/forward_iterator.h"
 
+#include <iostream>
 #include <limits>
 #include <string>
 #include <utility>
@@ -239,6 +240,8 @@ ForwardIterator::ForwardIterator(DBImpl* db, const ReadOptions& read_options,
     RebuildIterators(false);
   }
   if (!cfd_->ioptions()->env->GetFileSystem()->use_async_io()) {
+    std::cout << "!cfd_->ioptions()->env->GetFileSystem()->use_async_io()"
+              << std::endl;
     read_options_.async_io = false;
   }
 
@@ -1060,4 +1063,3 @@ void ForwardIterator::DeleteIterator(InternalIterator* iter, bool is_arena) {
 }
 
 }  // namespace ROCKSDB_NAMESPACE
-

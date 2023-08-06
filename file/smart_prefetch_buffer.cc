@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <cassert>
+#include <iostream>
 
 #include "file/random_access_file_reader.h"
 #include "monitoring/histogram.h"
@@ -409,6 +410,7 @@ Status SmartPrefetchBuffer::PrefetchAsyncInternal(
     const IOOptions& opts, RandomAccessFileReader* reader, uint64_t offset,
     size_t length, size_t readahead_size, Env::IOPriority rate_limiter_priority,
     bool& copy_to_third_buffer) {
+  // std::cout << "here4" << std::endl;
   if (!enable_) {
     return Status::OK();
   }
@@ -699,6 +701,7 @@ bool SmartPrefetchBuffer::TryReadFromCacheAsyncUntracked(
   }
 
   if (!enable_) {
+    // std::cout << "here1" << std::endl;
     return false;
   }
 
@@ -708,6 +711,7 @@ bool SmartPrefetchBuffer::TryReadFromCacheAsyncUntracked(
     // buffers will be outdated.
     // Random offset called. So abort the IOs.
     if (prev_offset_ != offset) {
+      std::cout << "here2" << std::endl;
       AbortAllIOs();
       bufs_[curr_].buffer_.Clear();
       bufs_[curr_ ^ 1].buffer_.Clear();
@@ -717,6 +721,7 @@ bool SmartPrefetchBuffer::TryReadFromCacheAsyncUntracked(
   }
 
   if (!explicit_prefetch_submitted_ && offset < bufs_[curr_].offset_) {
+    std::cout << "here3" << std::endl;
     return false;
   }
 

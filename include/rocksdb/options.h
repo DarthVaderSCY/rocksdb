@@ -1696,6 +1696,9 @@ struct ReadOptions {
   // Default: true
   bool optimize_multiget_for_io;
 
+  // 预取是否异步
+  bool async_prefetch;
+
   Env::IOActivity io_activity;
 
   ReadOptions();

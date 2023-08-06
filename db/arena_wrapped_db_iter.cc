@@ -9,6 +9,8 @@
 
 #include "db/arena_wrapped_db_iter.h"
 
+#include <iostream>
+
 #include "memory/arena.h"
 #include "rocksdb/env.h"
 #include "rocksdb/iterator.h"
@@ -48,6 +50,8 @@ void ArenaWrappedDBIter::Init(
   allow_refresh_ = allow_refresh;
   memtable_range_tombstone_iter_ = nullptr;
   if (!env->GetFileSystem()->use_async_io()) {
+    // std::cout << env->GetFileSystem()->Type() << std::endl;
+    // std::cout << "!env->GetFileSystem()->use_async_io()" << std::endl;
     read_options_.async_io = false;
   }
 }
