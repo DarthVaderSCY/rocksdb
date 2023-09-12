@@ -1,0 +1,7 @@
+cmake_minimum_required(VERSION 3.4)
+
+set(pmem_scache_SOURCES "pmem_scache.cc" PARENT_SCOPE)
+set(pmem_scache_INCLUDE_PATHS "${PMEM_PATH}/include" PARENT_SCOPE)
+set(pmem_scache_LINK_PATHS "${PMEM_PATH}/lib" PARENT_SCOPE)
+set(pmem_scache_LIBS "qpl;accel-config;dl" PARENT_SCOPE)
+set(pmem_scache_CMAKE_EXE_LINKER_FLAGS "-u pmem_scache_reg" PARENT_SCOPE)
